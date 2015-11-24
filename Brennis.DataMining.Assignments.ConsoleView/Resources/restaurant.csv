@@ -1,0 +1,13 @@
+Alternative,Bar,FridaySat,Hunger,Pat,price,Rain,Res,Est,Type,wait
+yes,no,no,yes,some,$$$,no,yes,0-10,french,yes
+yes,no,no,yes,full,$,no,no,30-60,thai,no
+no,yes,no,no,some,$,no,no,0-10,burger,yes
+yes,no,yes,yes,full,$,no,no,10-30,thai,yes
+yes,no,yes,no,full,$$$,no,yes,60+,french,no
+no,yes,no,yes,some,$$,yes,yes,0-10,italian,yes
+no,yes,no,no,none,$,yes,no,0-10,burger,no
+no,no,no,yes,some,$$,yes,yes,0-10,thai,yes
+no,yes,yes,no,full,$,yes,no,60+,burger,no
+yes,yes,yes,yes,full,$$$,no,yes,10-30,italian,no
+no,no,no,no,none,$,no,no,0-10,thai,no
+yes,yes,yes,yes,full,$,no,no,30-60,burger,yes

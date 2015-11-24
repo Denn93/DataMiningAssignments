@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brennis.DataMining.Assignments.ConsoleView", "Brennis.DataMining.Assignments.ConsoleView\Brennis.DataMining.Assignments.ConsoleView.csproj", "{A1231EF5-1163-46F4-AE3C-5A6FA533F96F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brennis.DataMining.Assignments.Common", "Brennis.DataMining.Assignments.Common\Brennis.DataMining.Assignments.Common.csproj", "{55DE6434-3238-4350-ABB1-70FC3B8A8074}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brennis.DataMining.Assignments.DataAccess", "Brennis.DataMining.Assignments.DataAccess\Brennis.DataMining.Assignments.DataAccess.csproj", "{590776D4-DBE9-4C7C-B52D-81E8F2812CFD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1231EF5-1163-46F4-AE3C-5A6FA533F96F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1231EF5-1163-46F4-AE3C-5A6FA533F96F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1231EF5-1163-46F4-AE3C-5A6FA533F96F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1231EF5-1163-46F4-AE3C-5A6FA533F96F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55DE6434-3238-4350-ABB1-70FC3B8A8074}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55DE6434-3238-4350-ABB1-70FC3B8A8074}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55DE6434-3238-4350-ABB1-70FC3B8A8074}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55DE6434-3238-4350-ABB1-70FC3B8A8074}.Release|Any CPU.Build.0 = Release|Any CPU
+		{590776D4-DBE9-4C7C-B52D-81E8F2812CFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{590776D4-DBE9-4C7C-B52D-81E8F2812CFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{590776D4-DBE9-4C7C-B52D-81E8F2812CFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{590776D4-DBE9-4C7C-B52D-81E8F2812CFD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
