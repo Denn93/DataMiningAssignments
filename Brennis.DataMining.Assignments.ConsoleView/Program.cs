@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using Brennis.DataMining.Assignments.DataAccess.CsvReader;
+using Brennis.DataMining.Assignments.DataAccess.Likelihood;
 using Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm;
 using Brennis.DataMining.Assignments.DataAccess.ZeroRAlgorithm;
 
@@ -20,7 +21,7 @@ namespace Brennis.DataMining.Assignments.ConsoleView
 
         private static void EnterTheMatrix()
         {
-            DataTable data = new CsvReader().ReadToDataTable("restaurantnumeric.csv", "Restaurant");
+            DataTable data = new CsvReader().ReadToDataTable("restaurantmissing.csv", "Restaurant");
             ViewTheMatrixData(data);
 
             Console.WriteLine("Enter a command:");
@@ -43,6 +44,13 @@ namespace Brennis.DataMining.Assignments.ConsoleView
                         oneAlgorithm.Print();
 
                         loop = false;
+
+                        Console.WriteLine("Enter the probability rule: ");
+                        Console.WriteLine("EXAMPLE --> weer:zonnig, temperatuur:koel, vochtigheid:hoog , wind:ja, spelen:ja");
+                        string line = Console.ReadLine();
+
+                        Console.WriteLine(new LikelihoodAlgorithm(data, oneAlgorithm.ResultTables, oneAlgorithm.TargetColumn, line).Process());
+                        Console.WriteLine();
                         break;
                     case "exit":
                         loop = false;

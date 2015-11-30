@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Brennis.DataMining.Assignments.Common;
+using Brennis.DataMining.Assignments.Common.Enum;
 using Brennis.DataMining.Assignments.Common.Extensions;
 
 namespace Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm
@@ -18,24 +20,56 @@ namespace Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm
                 .ToArray();
 
             ResultTables =
-                columnNames.Select(columnName => CreateTable(data, targetColumn, columnName)).ToList();
+                columnNames.Where((v, k) => StaticStorage.NormalDistributionValueItems.All(m => m.ColumnId != k))
+                    .Select(columnName => CreateTable(data, targetColumn, columnName))
+                    .ToList();
 
-            
+            ResultTables.AddRange(StaticStorage.NormalDistributionValueItems.Select(m=>CreateTable(m, data)));
         }
 
-        private static DataTable CreateTable(DataTable data, string targetColumn, string predictorColumn)
+        private DataTable CreateTable(NormalDistributionValueItem item, DataTable data)
+        {
+            string predictorColumn = data.Columns[item.ColumnId].ColumnName;
+            string[] predictorValues = data.AsEnumerable().Select(m => m[predictorColumn].ToString().Format()).Where(m => m != "").ToArray();
+            string[] predictorDistinctValues = predictorValues.Distinct().ToArray();
+
+            DataTable result = new DataTable($"{data.Columns[item.ColumnId].ColumnName} - {TargetColumn}");
+            result.Columns.Add(predictorColumn.Format());
+            result.Columns.Add("probability (normal distribution)");
+
+            foreach (string predictorDistinctValue in predictorDistinctValues)
+            {
+                DataRow row = result.NewRow();
+                row[predictorColumn.Format()] = predictorDistinctValue;
+
+               /* double exponent =
+                    Math.Exp(-(Math.Pow(double.Parse(predictorDistinctValue) - item.Mean, 2)/(2*Math.Pow(item.Std, 2))));
+                double probability = (1/(Math.Sqrt(2*Math.PI)*item.Std))*exponent;*/
+
+                double zscore = (double.Parse(predictorDistinctValue) - item.Mean)/item.Std;
+                double exponent = -(zscore*zscore)/2;
+                double probability = (1/Math.Sqrt(2*Math.PI))*Math.Exp(exponent);
+
+                row[1] = Math.Round(probability,6);
+                result.Rows.Add(row);
+            }
+
+            return result;
+        }
+
+        private DataTable CreateTable(DataTable data, string targetColumn, string predictorColumn)
         {
             DataTable result = new DataTable($"{targetColumn} - {predictorColumn}");
 
-            string[] targetValues = data.AsEnumerable().Select(m => m[targetColumn].ToString()).ToArray();
-            string[] predictorValues = data.AsEnumerable().Select(m => m[predictorColumn].ToString()).ToArray();
+            string[] targetValues = data.AsEnumerable().Select(m => m[targetColumn].ToString().Format()).Where(m => m != "").ToArray();
+            string[] predictorValues = data.AsEnumerable().Select(m => m[predictorColumn].ToString().Format()).Where(m => m != "").ToArray();
 
             string[] targetDistinctValues = targetValues.Distinct().ToArray();
             string[] predictorDistinctValues = predictorValues.Distinct().ToArray();
 
-            result.Columns.Add(predictorColumn);
+            result.Columns.Add(predictorColumn.Format());
             result.AddColumns(targetDistinctValues);
-            result.Columns.Add("Probability");
+            result.Columns.Add("probability");
 
             foreach (string predictorDistinctValue in predictorDistinctValues)
             {
@@ -45,17 +79,19 @@ namespace Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm
                 DataRow row = result.NewRow();
                 foreach (string targetDistinctValue in targetDistinctValues)
                 {
-                        string query =
-                        $"{targetColumn} = '{targetDistinctValue}' AND {predictorColumn} = '{predictorDistinctValue}'";
+                    string query =
+                    $"{targetColumn} = '{targetDistinctValue}' AND {predictorColumn} = '{predictorDistinctValue}'";
 
-                    row[targetDistinctValue] = data.Select(query).Length;
+                    string totalQuery = $"{TargetColumn}='{targetDistinctValue}'";
+                    row[targetDistinctValue] = data.Select(query).Length + "/" + data.Select(totalQuery).Length;
                 }
 
-                row["Probability"] = targetDistinctValues.Sum(m => int.Parse(row[m].ToString()));
+                row["probability"] = targetDistinctValues.Sum(m => int.Parse(row[m].ToString().Split('/')[0]));
 
                 row[predictorColumn] = predictorDistinctValue; 
                 result.Rows.Add(row);
             }
+
             return result;
         }
 
@@ -85,13 +121,18 @@ namespace Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm
                             Console.Write("{0,-10} {1,2}", row.ItemArray[0], "|");
                         else if (i > 0 && i < row.ItemArray.Length - 1)
                         {
-                            string query = $"{TargetColumn}='{table.Columns[i]}'";
-                            Console.Write("{0,-10} {1,2}", row.ItemArray[i] + "/" + DataSet.Select(query).Length, "|");
+                            Console.Write("{0,-10} {1,2}", row.ItemArray[i], "|");
                         }
                         else
-                            Console.Write("{0,-10} {1,2}",
-                                row.ItemArray[i] + "/" + dataSetCount + "= " +
-                                Math.Round(int.Parse(row.ItemArray[i].ToString())/(double) dataSetCount, 2), "|");
+                        {
+                            if (row.ItemArray.Length > 2)
+                                Console.Write("{0,-10} {1,2}",
+                                    row.ItemArray[i] + "/" + dataSetCount + "= " +
+                                    Math.Round(int.Parse(row.ItemArray[i].ToString())/(double) dataSetCount, 2), "|");
+                            else
+                                Console.Write("{0,-10} {1,2}", row.ItemArray[i], "|");
+                        }
+                            
                     }
                     
                     Console.WriteLine();
