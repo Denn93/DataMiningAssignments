@@ -3,66 +3,74 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Brennis.DataMining.Assignments.Common;
-using Brennis.DataMining.Assignments.Common.Enum;
 using Brennis.DataMining.Assignments.Common.Extensions;
 
 namespace Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm
 {
     public class OneRAlgorithm : IOneRAlgorithm
     {
-        public void Process(DataTable data, string targetColumn)
+        public void Process()
         {
-            TargetColumn = targetColumn;
-            DataSet = data;
-
-            string[] columnNames = data.Columns.Cast<DataColumn>()
+            
+            string[] columnNames = StaticStorage.DataSet.Columns.Cast<DataColumn>()
                 .Select(x => x.ColumnName)
                 .ToArray();
 
             ResultTables =
                 columnNames.Where((v, k) => StaticStorage.NormalDistributionValueItems.All(m => m.ColumnId != k))
-                    .Select(columnName => CreateTable(data, targetColumn, columnName))
+                    .Select(CreateTable)
                     .ToList();
 
-            ResultTables.AddRange(StaticStorage.NormalDistributionValueItems.Select(m=>CreateTable(m, data)));
+            ResultTables.AddRange(
+                StaticStorage.NormalDistributionValueItems.GroupBy(m => m.ColumnId).Select(m => CreateTable(m.Key, m.ToList())));
         }
 
-        private DataTable CreateTable(NormalDistributionValueItem item, DataTable data)
+        private DataTable CreateTable(int columnId, List<NormalDistributionValueItem> items)
         {
-            string predictorColumn = data.Columns[item.ColumnId].ColumnName;
-            string[] predictorValues = data.AsEnumerable().Select(m => m[predictorColumn].ToString().Format()).Where(m => m != "").ToArray();
+            string[] targetValues = StaticStorage.DataSet.AsEnumerable().Select(m => m[StaticStorage.TargetColum].ToString().Format()).Where(m => m != "").ToArray();
+            string[] targetDistinctValues = targetValues.Distinct().ToArray();
+
+            string predictorColumn = StaticStorage.DataSet.Columns[columnId].ColumnName;
+            string[] predictorValues = StaticStorage.DataSet.AsEnumerable().Select(m => m[predictorColumn].ToString().Format()).Where(m => m != "").ToArray();
             string[] predictorDistinctValues = predictorValues.Distinct().ToArray();
 
-            DataTable result = new DataTable($"{data.Columns[item.ColumnId].ColumnName} - {TargetColumn}");
+            DataTable result = new DataTable($"{StaticStorage.DataSet.Columns[columnId].ColumnName} - {StaticStorage.TargetColum}");
             result.Columns.Add(predictorColumn.Format());
-            result.Columns.Add("probability (normal distribution)");
+            result.AddColumns(targetDistinctValues);
 
             foreach (string predictorDistinctValue in predictorDistinctValues)
             {
                 DataRow row = result.NewRow();
-                row[predictorColumn.Format()] = predictorDistinctValue;
+                foreach (string targetDistinctValue in targetDistinctValues)
+                {
+                    row[predictorColumn.Format()] = predictorDistinctValue;
 
-               /* double exponent =
-                    Math.Exp(-(Math.Pow(double.Parse(predictorDistinctValue) - item.Mean, 2)/(2*Math.Pow(item.Std, 2))));
-                double probability = (1/(Math.Sqrt(2*Math.PI)*item.Std))*exponent;*/
+                    NormalDistributionValueItem item = items.First(m => m.TargetValue.Equals(targetDistinctValue));
 
-                double zscore = (double.Parse(predictorDistinctValue) - item.Mean)/item.Std;
-                double exponent = -(zscore*zscore)/2;
-                double probability = (1/Math.Sqrt(2*Math.PI))*Math.Exp(exponent);
+                    double exponent =
+                         Math.Exp(-(Math.Pow(double.Parse(predictorDistinctValue) - item.Mean, 2)/(2*Math.Pow(item.Std, 2))));
+                    double probability = (1/(Math.Sqrt(2*Math.PI)*item.Std))*exponent;
 
-                row[1] = Math.Round(probability,6);
+                    
+
+/*                    double zscore = (double.Parse(predictorDistinctValue) - item.Mean) / item.Std;
+                    double exponent = -(zscore * zscore) / 2;
+                    double probability = (1 / Math.Sqrt(2 * Math.PI)) * Math.Exp(exponent);*/
+
+                    row[targetDistinctValue] = Math.Round(probability, 6);
+                }
                 result.Rows.Add(row);
             }
 
             return result;
         }
 
-        private DataTable CreateTable(DataTable data, string targetColumn, string predictorColumn)
+        private DataTable CreateTable(string predictorColumn)
         {
-            DataTable result = new DataTable($"{targetColumn} - {predictorColumn}");
+            DataTable result = new DataTable($"{StaticStorage.TargetColum} - {predictorColumn}");
 
-            string[] targetValues = data.AsEnumerable().Select(m => m[targetColumn].ToString().Format()).Where(m => m != "").ToArray();
-            string[] predictorValues = data.AsEnumerable().Select(m => m[predictorColumn].ToString().Format()).Where(m => m != "").ToArray();
+            string[] targetValues = StaticStorage.DataSet.AsEnumerable().Select(m => m[StaticStorage.TargetColum].ToString().Format()).Where(m => m != "").ToArray();
+            string[] predictorValues = StaticStorage.DataSet.AsEnumerable().Select(m => m[predictorColumn].ToString().Format()).Where(m => m != "").ToArray();
 
             string[] targetDistinctValues = targetValues.Distinct().ToArray();
             string[] predictorDistinctValues = predictorValues.Distinct().ToArray();
@@ -73,17 +81,17 @@ namespace Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm
 
             foreach (string predictorDistinctValue in predictorDistinctValues)
             {
-                if (targetColumn == predictorColumn)
+                if (StaticStorage.TargetColum == predictorColumn)
                     continue;
 
                 DataRow row = result.NewRow();
                 foreach (string targetDistinctValue in targetDistinctValues)
                 {
                     string query =
-                    $"{targetColumn} = '{targetDistinctValue}' AND {predictorColumn} = '{predictorDistinctValue}'";
+                    $"{StaticStorage.TargetColum} = '{targetDistinctValue}' AND {predictorColumn} = '{predictorDistinctValue}'";
 
-                    string totalQuery = $"{TargetColumn}='{targetDistinctValue}'";
-                    row[targetDistinctValue] = data.Select(query).Length + "/" + data.Select(totalQuery).Length;
+                    string totalQuery = $"{StaticStorage.TargetColum}='{targetDistinctValue}'";
+                    row[targetDistinctValue] = StaticStorage.DataSet.Select(query).Length + "/" + StaticStorage.DataSet.Select(totalQuery).Length;
                 }
 
                 row["probability"] = targetDistinctValues.Sum(m => int.Parse(row[m].ToString().Split('/')[0]));
@@ -99,11 +107,11 @@ namespace Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm
         {
             Console.WriteLine();
             Console.WriteLine();
-            Console.WriteLine("OneRAlgorithm Result with targetColumn: {0}", TargetColumn);
+            Console.WriteLine("OneRAlgorithm Result with targetColumn: {0}", StaticStorage.TargetColum);
             Console.WriteLine("-----------------------------------------------------------");
             Console.WriteLine();
 
-            int dataSetCount = DataSet.Rows.Count;
+            int dataSetCount = StaticStorage.DataSet.Rows.Count;
             foreach (DataTable table in ResultTables)
             {
                 Console.WriteLine("Result DataTable: {0}", table.TableName);
@@ -125,7 +133,7 @@ namespace Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm
                         }
                         else
                         {
-                            if (row.ItemArray.Length > 2)
+                            if (row.ItemArray.Length > 3)
                                 Console.Write("{0,-10} {1,2}",
                                     row.ItemArray[i] + "/" + dataSetCount + "= " +
                                     Math.Round(int.Parse(row.ItemArray[i].ToString())/(double) dataSetCount, 2), "|");
@@ -144,10 +152,6 @@ namespace Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm
             }
         }
 
-        public string TargetColumn { get; set; }
-
         public List<DataTable> ResultTables { get; private set; }
-
-        public DataTable DataSet { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Brennis.DataMining.Assignments.Common;
 using Brennis.DataMining.Assignments.Common.Extensions;
 using Expression = NCalc.Expression;
 
@@ -9,18 +10,14 @@ namespace Brennis.DataMining.Assignments.DataAccess.Likelihood
 {
     public class LikelihoodAlgorithm : ILikelihoodAlgorithm
     {
-        private readonly DataTable _dataSet;
         private readonly List<DataTable> _oneRResultSet;
-        private readonly string _targetColumn;
         private readonly string _inputRule;
         private readonly List<KeyValuePair<string, string>> _likelihoods;  
 
-        public LikelihoodAlgorithm(DataTable dataSet, List<DataTable> oneRResultSet, string targetColumn,
+        public LikelihoodAlgorithm(List<DataTable> oneRResultSet,
             string inputRule)
         {
-            _dataSet = dataSet;
             _oneRResultSet = oneRResultSet;
-            _targetColumn = targetColumn;
             _inputRule = inputRule;
             _likelihoods = new List<KeyValuePair<string, string>>();
         }
@@ -33,16 +30,16 @@ namespace Brennis.DataMining.Assignments.DataAccess.Likelihood
             if (input == null)
                 return "An error occurred during the process of your input. Check input values!!!";
 
-            KeyValuePair<string, string> targetColumnPair = input.Find(i => i.Key.Format() == _targetColumn.Format());
+            KeyValuePair<string, string> targetColumnPair = input.Find(i => i.Key.Format() == StaticStorage.TargetColum.Format());
 
-            string[] targetValues = _dataSet.AsEnumerable().Select(m => m[_targetColumn].ToString().Format()).ToArray();
+            string[] targetValues = StaticStorage.DataSet.AsEnumerable().Select(m => m[StaticStorage.TargetColum].ToString().Format()).ToArray();
             string[] targetDistinctValues = targetValues.Distinct().ToArray();
 
             if (targetColumnPair.Equals(null))
                 return "targetColumn is not specified!!.";
 
             foreach (string targetDistinct in targetDistinctValues)
-                _likelihoods.Add(ProcessProbability(new KeyValuePair<string, string>(_targetColumn, targetDistinct),
+                _likelihoods.Add(ProcessProbability(new KeyValuePair<string, string>(StaticStorage.TargetColum, targetDistinct),
                     input));
 
 
@@ -66,11 +63,11 @@ namespace Brennis.DataMining.Assignments.DataAccess.Likelihood
                 .Format()
                 .Replace(" ", " * ");
 
-            result += " * " + _dataSet.Select($"{_targetColumn} = '{targetColumnPair.Value}'").Length + "/" +
-                      _dataSet.Rows.Count;
+            result += " * " + StaticStorage.DataSet.Select($"{StaticStorage.TargetColum} = '{targetColumnPair.Value}'").Length + "/" +
+                      StaticStorage.DataSet.Rows.Count;
 
 
-            if (result.Contains("0"))
+            if (result.Contains("0/"))
             {
                 string[] values = result.Split('*');
                 result = string.Empty;

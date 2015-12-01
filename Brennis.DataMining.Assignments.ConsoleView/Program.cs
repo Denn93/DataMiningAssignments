@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using Brennis.DataMining.Assignments.Common;
 using Brennis.DataMining.Assignments.DataAccess.CsvReader;
 using Brennis.DataMining.Assignments.DataAccess.Likelihood;
 using Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm;
@@ -7,9 +8,9 @@ using Brennis.DataMining.Assignments.DataAccess.ZeroRAlgorithm;
 
 namespace Brennis.DataMining.Assignments.ConsoleView
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.WriteLine("DataMining Assignments. Restaurant assignments");
             Console.WriteLine("----------------------------------------------");
@@ -21,8 +22,13 @@ namespace Brennis.DataMining.Assignments.ConsoleView
 
         private static void EnterTheMatrix()
         {
-            DataTable data = new CsvReader().ReadToDataTable("restaurantmissing.csv", "Restaurant");
-            ViewTheMatrixData(data);
+            Console.WriteLine("Enter the targetColumn:");
+            string targetColumn = Console.ReadLine();
+
+            StaticStorage.TargetColum = targetColumn;
+            StaticStorage.DataSet = new CsvReader().ReadToDataTable("restaurantmissing.csv", "Restaurant");
+
+            ViewTheMatrixData();
 
             Console.WriteLine("Enter a command:");
             string input = Console.ReadLine();
@@ -33,14 +39,14 @@ namespace Brennis.DataMining.Assignments.ConsoleView
                 {
                     case "zeror":
                         ZeroRAlgorithm algorithm = new ZeroRAlgorithm();
-                        algorithm.Process(data, "wait");
+                        algorithm.Process();
                         algorithm.Print();
 
                         loop = false;
                         break;
                     case "oner":
                         OneRAlgorithm oneAlgorithm = new OneRAlgorithm();
-                        oneAlgorithm.Process(data, "wait");
+                        oneAlgorithm.Process();
                         oneAlgorithm.Print();
 
                         loop = false;
@@ -49,7 +55,7 @@ namespace Brennis.DataMining.Assignments.ConsoleView
                         Console.WriteLine("EXAMPLE --> weer:zonnig, temperatuur:koel, vochtigheid:hoog , wind:ja, spelen:ja");
                         string line = Console.ReadLine();
 
-                        Console.WriteLine(new LikelihoodAlgorithm(data, oneAlgorithm.ResultTables, oneAlgorithm.TargetColumn, line).Process());
+                        Console.WriteLine(new LikelihoodAlgorithm(oneAlgorithm.ResultTables, line).Process());
                         Console.WriteLine();
                         break;
                     case "exit":
@@ -65,10 +71,10 @@ namespace Brennis.DataMining.Assignments.ConsoleView
             }
         }
 
-        private static void ViewTheMatrixData(DataTable table)
+        private static void ViewTheMatrixData()
         {
-            Console.WriteLine(table.TableName);
-            foreach (DataRow row in table.Rows)
+            Console.WriteLine(StaticStorage.DataSet.TableName);
+            foreach (DataRow row in StaticStorage.DataSet.Rows)
             {
                 foreach (object value in row.ItemArray)
                     Console.Write("{0,-3} {1,1}", value, "|");

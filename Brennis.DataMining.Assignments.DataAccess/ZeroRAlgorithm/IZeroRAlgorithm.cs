@@ -4,7 +4,7 @@ namespace Brennis.DataMining.Assignments.DataAccess.ZeroRAlgorithm
 {
     public interface IZeroRAlgorithm
     {
-        void Process(DataTable dataSet, string targetColumn);
+        void Process();
         void Print();
 
     }

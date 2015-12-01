@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Brennis.DataMining.Assignments.Common;
 using Brennis.DataMining.Assignments.DataAccess.Models;
 
 namespace Brennis.DataMining.Assignments.DataAccess.ZeroRAlgorithm
@@ -9,10 +10,10 @@ namespace Brennis.DataMining.Assignments.DataAccess.ZeroRAlgorithm
     public class ZeroRAlgorithm : IZeroRAlgorithm
     {
         
-        public void Process(DataTable dataSet, string targetColumn)
+        public void Process()
         {
-            TargetColumn = targetColumn;
-            List<string> targetValues = dataSet.AsEnumerable().Select(m => m[TargetColumn].ToString()).ToList();
+            TargetColumn = StaticStorage.TargetColum;
+            List<string> targetValues = StaticStorage.DataSet.AsEnumerable().Select(m => m[TargetColumn].ToString()).ToList();
 
             ResultSet =
                 targetValues.GroupBy(m => m)

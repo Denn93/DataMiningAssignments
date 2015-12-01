@@ -73,23 +73,33 @@ namespace Brennis.DataMining.Assignments.Common.Extensions
 
                     case TypeOfNumericProbabilityEnum.NormalDistribution:
 
+                    string[] targetValues = result.AsEnumerable().Select(m => m[StaticStorage.TargetColum].ToString().Format()).ToArray();
+                    string[] targetDistinctValues = targetValues.Distinct().ToArray();
+
                     List<NormalDistributionValueItem> valueItems = new List<NormalDistributionValueItem>();
 
                     foreach (int numericColumn in numericColumns)
                     {
-                        NormalDistributionValueItem normalDistributionValue = new NormalDistributionValueItem();
-                        List<int> values =
-                            (from DataRow dataRow in result.Rows select int.Parse(dataRow[numericColumn].ToString()))
-                                .ToList();
+                        foreach (string targetDistinctValue in targetDistinctValues)
+                        {
+                            NormalDistributionValueItem normalDistributionValue = new NormalDistributionValueItem();
 
-                        normalDistributionValue.ColumnId = numericColumn;
-                        normalDistributionValue.Mean = values.Average();
-                        normalDistributionValue.Variance =
-                            values.Sum(m => Math.Pow(m - normalDistributionValue.Mean, 2))/values.Count - 1;
+                            List<int> values =
+                                (from DataRow dataRow in result.Rows
+                                    where dataRow[StaticStorage.TargetColum].Equals(targetDistinctValue)
+                                    select int.Parse(dataRow[numericColumn].ToString()))
+                                    .ToList();
 
-                        normalDistributionValue.Std = Math.Sqrt(normalDistributionValue.Variance);
+                            normalDistributionValue.ColumnId = numericColumn;
+                            normalDistributionValue.TargetValue = targetDistinctValue;
+                            normalDistributionValue.Mean = values.Average();
+                            normalDistributionValue.Variance =
+                                values.Sum(m => Math.Pow(m - normalDistributionValue.Mean, 2))/values.Count - 1;
 
-                        valueItems.Add(normalDistributionValue);
+                            normalDistributionValue.Std = Math.Sqrt(normalDistributionValue.Variance);
+
+                            valueItems.Add(normalDistributionValue);
+                        }
                     }
 
                     StaticStorage.NormalDistributionValueItems = valueItems;
