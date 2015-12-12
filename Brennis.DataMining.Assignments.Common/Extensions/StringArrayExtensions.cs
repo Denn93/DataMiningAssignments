@@ -45,9 +45,29 @@ namespace Brennis.DataMining.Assignments.Common.Extensions
                 first[0] = false;
             }
 
+            PrefillNumericMissingValues(result, numericColumns);
             PerformBinning(typeOfNumericProbability, result, numericColumns);
-            
+
             return result;
+        }
+
+        private static void PrefillNumericMissingValues(DataTable result, List<int> numericColumns)
+        {
+            foreach (int numericColumn in numericColumns)
+            {
+                string[] numericValues = result.AsEnumerable().Select(m => m[numericColumn].ToString().Format()).ToArray();
+
+                List<int> emptyRows =
+                    numericValues.Select((v, k) => new {Key = k, Value = v.Trim()})
+                        .Where(m => m.Value == "")
+                        .Select(m => m.Key)
+                        .ToList();
+
+                double mean = Math.Round(numericValues.Where(m=>m != "").Average(m => double.Parse(m)), 2);
+
+                foreach (int emptyRow in emptyRows)
+                    result.Rows[emptyRow][numericColumn] = mean.ToString().Replace(',','.');
+            }
         }
 
         private static void PerformBinning(TypeOfNumericProbabilityEnum probabilityEnum, DataTable result, List<int> numericColumns)
@@ -84,10 +104,10 @@ namespace Brennis.DataMining.Assignments.Common.Extensions
                         {
                             NormalDistributionValueItem normalDistributionValue = new NormalDistributionValueItem();
 
-                            List<int> values =
+                            List<double> values =
                                 (from DataRow dataRow in result.Rows
                                     where dataRow[StaticStorage.TargetColum].Equals(targetDistinctValue)
-                                    select int.Parse(dataRow[numericColumn].ToString()))
+                                    select double.Parse(dataRow[numericColumn].ToString()))
                                     .ToList();
 
                             normalDistributionValue.ColumnId = numericColumn;
@@ -104,6 +124,8 @@ namespace Brennis.DataMining.Assignments.Common.Extensions
 
                     StaticStorage.NormalDistributionValueItems = valueItems;
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(probabilityEnum), probabilityEnum, null);
             }
         }
     }

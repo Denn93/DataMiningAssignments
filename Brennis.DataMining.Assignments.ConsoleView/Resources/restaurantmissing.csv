@@ -7,7 +7,7 @@ yes,no,yes,no,full,$$$,no,yes,60,french,no
 no,yes,no,yes,some,$$,yes,yes,0,italian,yes
 no,yes,no,no,none,$,yes,no,0,burger,no
 no,no,no,yes,some,$$,yes,yes,0,thai,yes
-no,yes,yes,no,full,$,yes,no,60,burger,no
+no,yes,yes,no,full,$,yes,no,,burger,no
 yes,yes,yes,yes,full,$$$,no,yes,10,italian,no
 no,no,no,no,none,$,no,no,0,thai,no
 yes,yes,yes,yes,full,$,no,no,30,burger,yes

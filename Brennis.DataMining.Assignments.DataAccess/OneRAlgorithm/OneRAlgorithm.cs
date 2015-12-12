@@ -47,15 +47,15 @@ namespace Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm
 
                     NormalDistributionValueItem item = items.First(m => m.TargetValue.Equals(targetDistinctValue));
 
-                    double exponent =
+/*                    double exponent =
                          Math.Exp(-(Math.Pow(double.Parse(predictorDistinctValue) - item.Mean, 2)/(2*Math.Pow(item.Std, 2))));
-                    double probability = (1/(Math.Sqrt(2*Math.PI)*item.Std))*exponent;
+                    double probability = (1/(Math.Sqrt(2*Math.PI)*item.Std))*exponent;*/
 
                     
 
-/*                    double zscore = (double.Parse(predictorDistinctValue) - item.Mean) / item.Std;
+                    double zscore = (double.Parse(predictorDistinctValue) - item.Mean) / item.Std;
                     double exponent = -(zscore * zscore) / 2;
-                    double probability = (1 / Math.Sqrt(2 * Math.PI)) * Math.Exp(exponent);*/
+                    double probability = (1 / Math.Sqrt(2 * Math.PI)) * Math.Exp(exponent);
 
                     row[targetDistinctValue] = Math.Round(probability, 6);
                 }

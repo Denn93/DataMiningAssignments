@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Brennis.DataMining.Assignments.Common;
+using Brennis.DataMining.Assignments.Common.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Brennis.DataMining.Assignments.Common;
-using Brennis.DataMining.Assignments.Common.Extensions;
 using Expression = NCalc.Expression;
 
 namespace Brennis.DataMining.Assignments.DataAccess.Likelihood
@@ -12,7 +12,7 @@ namespace Brennis.DataMining.Assignments.DataAccess.Likelihood
     {
         private readonly List<DataTable> _oneRResultSet;
         private readonly string _inputRule;
-        private readonly List<KeyValuePair<string, string>> _likelihoods;  
+        private readonly List<KeyValuePair<string, string>> _likelihoods;
 
         public LikelihoodAlgorithm(List<DataTable> oneRResultSet,
             string inputRule)
@@ -28,23 +28,28 @@ namespace Brennis.DataMining.Assignments.DataAccess.Likelihood
             List<KeyValuePair<string, string>> input = ProcessInput(_inputRule);
 
             if (input == null)
-                return "An error occurred during the process of your input. Check input values!!!";
+                return "An error occurred during the process of your input. Check input Values!!!";
 
-            KeyValuePair<string, string> targetColumnPair = input.Find(i => i.Key.Format() == StaticStorage.TargetColum.Format());
+            KeyValuePair<string, string> targetColumnPair =
+                input.Find(i => i.Key.Format() == StaticStorage.TargetColum.Format());
 
-            string[] targetValues = StaticStorage.DataSet.AsEnumerable().Select(m => m[StaticStorage.TargetColum].ToString().Format()).ToArray();
+            string[] targetValues =
+                StaticStorage.DataSet.AsEnumerable()
+                    .Select(m => m[StaticStorage.TargetColum].ToString().Format())
+                    .ToArray();
             string[] targetDistinctValues = targetValues.Distinct().ToArray();
 
             if (targetColumnPair.Equals(null))
                 return "targetColumn is not specified!!.";
 
             foreach (string targetDistinct in targetDistinctValues)
-                _likelihoods.Add(ProcessProbability(new KeyValuePair<string, string>(StaticStorage.TargetColum, targetDistinct),
-                    input));
-
+                _likelihoods.Add(
+                    ProcessProbability(new KeyValuePair<string, string>(StaticStorage.TargetColum, targetDistinct),
+                        input));
 
             string computation =
-                $"{_likelihoods.Find(m => m.Key == targetColumnPair.Value).Value} / ( {_likelihoods.Select(m => m.Value).Aggregate((i, j) => i + " + " + j)} )".Replace(',', '.');
+                $"{_likelihoods.Find(m => m.Key == targetColumnPair.Value).Value} / ( {_likelihoods.Select(m => m.Value).Aggregate((i, j) => i + " + " + j)} )"
+                    .Replace(',', '.');
 
             Console.WriteLine();
             Console.WriteLine(
@@ -53,7 +58,8 @@ namespace Brennis.DataMining.Assignments.DataAccess.Likelihood
             return result;
         }
 
-        private KeyValuePair<string, string> ProcessProbability(KeyValuePair<string, string> targetColumnPair, List<KeyValuePair<string, string>> input)
+        private KeyValuePair<string, string> ProcessProbability(KeyValuePair<string, string> targetColumnPair,
+            List<KeyValuePair<string, string>> input)
         {
             string result = string.Empty;
             result = input.Aggregate(result,
@@ -63,22 +69,48 @@ namespace Brennis.DataMining.Assignments.DataAccess.Likelihood
                 .Format()
                 .Replace(" ", " * ");
 
-            result += " * " + StaticStorage.DataSet.Select($"{StaticStorage.TargetColum} = '{targetColumnPair.Value}'").Length + "/" +
+            result += " * " +
+                      StaticStorage.DataSet.Select($"{StaticStorage.TargetColum} = '{targetColumnPair.Value}'").Length +
+                      "/" +
                       StaticStorage.DataSet.Rows.Count;
 
-
-            if (result.Contains("0/"))
+            if (result.Contains("0/") || result.Contains("0"))
             {
                 string[] values = result.Split('*');
                 result = string.Empty;
 
-                int total = values.Length - 1;
                 for (int i = 0; i < values.Length - 1; i++)
                 {
+                    if (values[i].ToLower().Contains("e"))
+                    {
+                        result += (result.Equals(string.Empty))
+                            ? $"{values[i]}"
+                            : $"* {values[i]}";
+
+                        continue;
+                    }
+
+                    if (values[i].Trim().Contains("0."))
+                    {
+                        result += (result.Equals(string.Empty))
+                            ? $"{values[i]}"
+                            : $"* {values[i]}";
+
+                        continue;
+                    }
+
+                    if (values[i].Trim().Equals("0"))
+                    {
+                        result += (result.Equals(string.Empty))
+                            ? $"1"
+                            : $"* 1";
+                        continue;
+                    }
+
                     string numerator = values[i].Split('/')[0];
                     string denominator = values[i].Split('/')[1];
 
-                    double numeratorAdd = double.Parse("1")/double.Parse("3");
+                    double numeratorAdd = double.Parse("1") / double.Parse("3");
 
                     numerator = (double.Parse(numerator) + numeratorAdd).ToString();
                     denominator = (int.Parse(denominator) + 1).ToString();
@@ -104,13 +136,14 @@ namespace Brennis.DataMining.Assignments.DataAccess.Likelihood
             {
                 return
                     inputRule.Split(',')
-                        .Select(m => new KeyValuePair<string, string>(m.Split(':')[0].Format(), m.Split(':')[1].Format()))
+                        .Select(
+                            m => new KeyValuePair<string, string>(m.Split(':')[0].Format(), m.Split(':')[1].Format()))
                         .ToList();
             }
             catch (Exception ex)
             {
                 return null;
             }
-        } 
+        }
     }
 }

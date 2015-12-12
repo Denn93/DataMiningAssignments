@@ -1,10 +1,11 @@
-﻿using System;
-using System.Data;
-using Brennis.DataMining.Assignments.Common;
+﻿using Brennis.DataMining.Assignments.Common;
 using Brennis.DataMining.Assignments.DataAccess.CsvReader;
+using Brennis.DataMining.Assignments.DataAccess.ID3;
 using Brennis.DataMining.Assignments.DataAccess.Likelihood;
 using Brennis.DataMining.Assignments.DataAccess.OneRAlgorithm;
 using Brennis.DataMining.Assignments.DataAccess.ZeroRAlgorithm;
+using System;
+using System.Data;
 
 namespace Brennis.DataMining.Assignments.ConsoleView
 {
@@ -26,7 +27,7 @@ namespace Brennis.DataMining.Assignments.ConsoleView
             string targetColumn = Console.ReadLine();
 
             StaticStorage.TargetColum = targetColumn;
-            StaticStorage.DataSet = new CsvReader().ReadToDataTable("restaurantmissing.csv", "Restaurant");
+            StaticStorage.DataSet = new CsvReader().ReadToDataTable("restaurant.csv", "Restaurant");
 
             ViewTheMatrixData();
 
@@ -44,6 +45,14 @@ namespace Brennis.DataMining.Assignments.ConsoleView
 
                         loop = false;
                         break;
+
+                    case "tree":
+                        DecisionTree tree = new DecisionTree();
+                        tree.Process();
+                        loop = false;
+
+                        break;
+
                     case "oner":
                         OneRAlgorithm oneAlgorithm = new OneRAlgorithm();
                         oneAlgorithm.Process();
@@ -58,10 +67,12 @@ namespace Brennis.DataMining.Assignments.ConsoleView
                         Console.WriteLine(new LikelihoodAlgorithm(oneAlgorithm.ResultTables, line).Process());
                         Console.WriteLine();
                         break;
+
                     case "exit":
                         loop = false;
                         Console.WriteLine("Press Enter to exit.");
                         break;
+
                     default:
                         Console.WriteLine("Command not found. Try again: ");
                         input = Console.ReadLine();

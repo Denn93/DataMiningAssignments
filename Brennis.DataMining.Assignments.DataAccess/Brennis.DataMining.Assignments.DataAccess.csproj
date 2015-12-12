@@ -50,6 +50,8 @@
   <ItemGroup>
     <Compile Include="CsvReader\CsvReader.cs" />
     <Compile Include="CsvReader\ICsvReader.cs" />
+    <Compile Include="ID3\DecisionTree.cs" />
+    <Compile Include="ID3\IDecisionTree.cs" />
     <Compile Include="Likelihood\ILikelihoodAlgorithm.cs" />
     <Compile Include="Likelihood\LikelihoodAlgorithm.cs" />
     <Compile Include="Models\ZeroRResultRow.cs" />
