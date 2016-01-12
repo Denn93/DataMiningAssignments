@@ -150,17 +150,37 @@ namespace Brennis.DataMining.Assignments.DataAccess.ID3
             return _mEntropySet + sum;
         }
 
+        private double SplitInfo(DataTable sample, double gain,  Attribute attribute)
+        {
+            double result = 0.0;
+            double sum = attribute.Values.Aggregate(0.0,
+                (current, value) =>
+                    current + StaticStorage.DataSet.Select(attribute.AttributeName + " = " + "'" + value + "'").Length);
+
+            foreach (string value in attribute.Values)
+            {
+                double current = StaticStorage.DataSet.Select(attribute.AttributeName + " = " + "'" + value + "'").Length;
+                result += -(current)*Math.Log(current/sum, 2);
+            }
+/*
+                info([p, q, r]) = 1 / (p + q + r) * [-(p) * 2log(p / (p + q + r)) - (q) * 2log(q / (p + q + r)) - (r) * 2log(r / (p + q + r))][bits];
+*/
+            return 1 / sum * result;
+        }
+
         private Attribute GetBestAttribute(DataTable samples, IEnumerable<Attribute> attributes)
         {
-            double maxGain = 0.0;
+            double maxGainRatio = 0.0;
             Attribute result = null;
 
             foreach (Attribute attribute in attributes)
             {
                 double aux = Gain(samples, attribute);
-                if (!(aux > maxGain)) continue;
+                double split = SplitInfo(samples, aux, attribute);
+                double gainRatio = aux/split;
+                if (!(gainRatio > maxGainRatio)) continue;
 
-                maxGain = aux;
+                maxGainRatio = gainRatio;
                 result = attribute;
             }
 
