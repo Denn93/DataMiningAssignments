@@ -143,6 +143,8 @@ namespace Brennis.DataMining.Assignments.DataAccess.ID3
 
                 GetValuesToAttribute(samples, attribute, value, out positives, out negatives);
 
+                if (negatives == 0 && positives == 0) continue;
+
                 double entropy = CalcEntropy(positives, negatives);
                 sum += -(double)(positives + negatives) / _total * entropy;
             }
@@ -155,12 +157,12 @@ namespace Brennis.DataMining.Assignments.DataAccess.ID3
             double result = 0.0;
             double sum = attribute.Values.Aggregate(0.0,
                 (current, value) =>
-                    current + StaticStorage.DataSet.Select(attribute.AttributeName + " = " + "'" + value + "'").Length);
+                    current + sample.Select(attribute.AttributeName + " = " + "'" + value + "'").Length);
 
             foreach (string value in attribute.Values)
             {
-                double current = StaticStorage.DataSet.Select(attribute.AttributeName + " = " + "'" + value + "'").Length;
-                result += -(current)*Math.Log(current/sum, 2);
+                double current = sample.Select(attribute.AttributeName + " = " + "'" + value + "'").Length;
+                result += -current*Math.Log(current/sum, 2);
             }
 /*
                 info([p, q, r]) = 1 / (p + q + r) * [-(p) * 2log(p / (p + q + r)) - (q) * 2log(q / (p + q + r)) - (r) * 2log(r / (p + q + r))][bits];
@@ -275,7 +277,7 @@ namespace Brennis.DataMining.Assignments.DataAccess.ID3
 
                 // Create a new list of attributes less the current Attribute that is the best Attribute
 
-                if (aSample.Rows.Count == 0)
+                if (aSample.Rows.Count == 0) 
                     return new TreeNode(new Attribute(GetMostCommonValue(aSample, targetAttribute)));
 
                 DecisionTreeId3 dc3 = new DecisionTreeId3();

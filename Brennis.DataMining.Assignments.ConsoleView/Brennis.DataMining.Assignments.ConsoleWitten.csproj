@@ -68,13 +68,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Brennis.DataMining.Assignments.Common\Brennis.DataMining.Assignments.Common.csproj">
+    <ProjectReference Include="..\Brennis.DataMining.Assignments.Common\Brennis.DataMining.Assignments.CommonWitten.csproj">
       <Project>{55de6434-3238-4350-abb1-70fc3b8a8074}</Project>
-      <Name>Brennis.DataMining.Assignments.Common</Name>
+      <Name>Brennis.DataMining.Assignments.CommonWitten</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Brennis.DataMining.Assignments.DataAccess\Brennis.DataMining.Assignments.DataAccess.csproj">
+    <ProjectReference Include="..\Brennis.DataMining.Assignments.DataAccess\Brennis.DataMining.Assignments.Witten.csproj">
       <Project>{590776d4-dbe9-4c7c-b52d-81e8f2812cfd}</Project>
-      <Name>Brennis.DataMining.Assignments.DataAccess</Name>
+      <Name>Brennis.DataMining.Assignments.Witten</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

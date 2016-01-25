@@ -62,9 +62,9 @@
     <Compile Include="ZeroRAlgorithm\ZeroRAlgorithm.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Brennis.DataMining.Assignments.Common\Brennis.DataMining.Assignments.Common.csproj">
+    <ProjectReference Include="..\Brennis.DataMining.Assignments.Common\Brennis.DataMining.Assignments.CommonWitten.csproj">
       <Project>{55de6434-3238-4350-abb1-70fc3b8a8074}</Project>
-      <Name>Brennis.DataMining.Assignments.Common</Name>
+      <Name>Brennis.DataMining.Assignments.CommonWitten</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
