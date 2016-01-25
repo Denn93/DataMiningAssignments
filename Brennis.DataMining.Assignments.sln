@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brennis.DataMining.Assignme
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brennis.DataMining.Assignments.Witten", "Brennis.DataMining.Assignments.Witten\Brennis.DataMining.Assignments.Witten.csproj", "{590776D4-DBE9-4C7C-B52D-81E8F2812CFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "INFDTA01-2.DennisBrian.DataSmartCh6", "INFDTA01-2.DennisBrian.DataSmartCh6\INFDTA01-2.DennisBrian.DataSmartCh6.csproj", "{B77F5246-8DD9-45DA-834E-6D8E6934982E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brennis.DataMining.Assignments.DataSmartCh6", "Brennis.DataMining.Assignments.DataSmartCh6\Brennis.DataMining.Assignments.DataSmartCh6.csproj", "{B77F5246-8DD9-45DA-834E-6D8E6934982E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
